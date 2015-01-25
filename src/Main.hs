@@ -1,20 +1,25 @@
 module Main where
 
 import Control.Monad (when)
+import Data.Char (toLower)
 import qualified Data.Map as M
+import System.Environment (getArgs)
 
 type Freq = M.Map Char Int
 
 measure :: String -> Freq
-measure = foldl (\m ch -> M.insertWith (+) ch 1 m) M.empty
+measure = foldl (\m ch -> M.insertWith (+) ch 1 m) M.empty . downcase
 
 (.<.) :: Freq -> Freq -> Bool
 x .<. y = and [n <= M.findWithDefault 0 ch y | (ch, n) <- M.toList x]
 
-elephantPig :: Freq
-elephantPig = measure "elephantPig"
+downcase :: String -> String
+downcase = map toLower
 
 main :: IO ()
-main = getContents >>= mapM_ test . lines
+main = do
+  [word] <- getArgs
+  let elephantPig = measure word
+  getContents >>= mapM_ (test elephantPig) . lines
   where
-    test s = when (measure s .<. elephantPig) $ putStrLn s
+    test f s = when (measure s .<. f) $ putStrLn s
