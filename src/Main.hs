@@ -2,16 +2,16 @@ module Main where
 
 import Control.Monad (when)
 import Data.Char (toLower)
-import qualified Data.Map as M
+import qualified Data.HashMap.Strict as M
 import System.Environment (getArgs)
 
-type Freq = M.Map Char Int
+type Freq = M.HashMap Char Int
 
 measure :: String -> Freq
 measure = foldl (\m ch -> M.insertWith (+) ch 1 m) M.empty . downcase
 
 (.<.) :: Freq -> Freq -> Bool
-x .<. y = and [n <= M.findWithDefault 0 ch y | (ch, n) <- M.toList x]
+x .<. y = and [n <= M.lookupDefault 0 ch y | (ch, n) <- M.toList x]
 
 downcase :: String -> String
 downcase = map toLower
